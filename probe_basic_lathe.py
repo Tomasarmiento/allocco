@@ -64,7 +64,10 @@ class ProbeBasicLathe(VCPMainWindow):
         }
         self.active_threads = {
             'gama_changer_1': [],
+            'init_cycle': [],
         }
+
+        self.actual_gear = ""
 
         self.py_out_pins = {
                             'Cmd_CNC_OK': 0,
@@ -318,10 +321,17 @@ class ProbeBasicLathe(VCPMainWindow):
 
         def run(self):
             try:
+                hola = 0
+                
                 self.msleep(3000)
                 while True:
-                    print("ESTADO DE SALIDAAAAAAAAAAAAAA",hal.get_value('qtpyvcp.FbkOut_Vel_CambioGamas.on'))
+                    #inicio = time.perf_counter()
                     result = self.main_window.gama_changer_1()
+                    #fin = time.perf_counter()
+                    #print(f"⏱ Tiempo de ejecución: {fin - inicio:.4f} segundos")
+                    ##print("ESTADO DE SALIDAAAAAAAAAAAAAA",hal.get_value('qtpyvcp.FbkOut_Vel_CambioGamas.on'))
+                    #hola += 1
+                    #print("se ejecuta main thread",hola)
                     if result:
                         dict_cmds, step = result
                         rutina_nombre = 'gama_changer_1'
@@ -340,7 +350,6 @@ class ProbeBasicLathe(VCPMainWindow):
                             # solo mensaje, ya no removemos desde acá
                             routine_thread.finished_signal.connect(lambda: print("🔔 Thread finalizado"))
                             routine_thread.start()
-
                     self.msleep(1000)
 
             except Exception as e:
@@ -423,7 +432,180 @@ class ProbeBasicLathe(VCPMainWindow):
         return error_messages
 
 
-    
+    def init_cycle(self):
+        rutina_nombre = 'init_cycle'
+        # STEP 0
+        step = 0
+        digin_init_step0 = {
+            'qtpyvcp.FbkIn_Ind_Gama_I.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_II.on': {
+                'leyenda_error': "SENSOR INDUCTIVO GAMA I",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_III.on': {
+                'leyenda_error': "SENSOR INDUCTIVO GAMA I",
+                'estado': 0
+            },
+        }
+
+        errores = self.check_init(digin_init_step0)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 0")
+            for err in errores:
+                print("los checkinit por los cuales no ejecuta rutina son",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+                self.actual_gear = 'gear1'
+
+        # STEP 1
+        step = 1
+        digin_init_step1 = {
+            'qtpyvcp.FbkIn_Ind_Gama_I.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_II.on': {
+                'leyenda_error': "SENSOR INDUCTIVO GAMA I",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_III.on': {
+                'leyenda_error': "SENSOR INDUCTIVO GAMA I",
+                'estado': 0
+            },
+        }
+
+        errores = self.check_init(digin_init_step1)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 1")
+            for err in errores:
+                print("los checkinit por los cuales no ejecuta rutina son",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+                self.actual_gear = 'gear2'
+
+
+        # STEP 2
+        step = 2
+        digin_init_step2 = {
+            'qtpyvcp.FbkIn_Ind_Gama_I.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_II.on': {
+                'leyenda_error': "SENSOR INDUCTIVO GAMA I",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_III.on': {
+                'leyenda_error': "SENSOR INDUCTIVO GAMA I",
+                'estado': 1
+            },
+        }
+
+        errores = self.check_init(digin_init_step2)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 2")
+            for err in errores:
+                print("los checkinit por los cuales no ejecuta rutina son",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+                self.actual_gear = 'gear3'
+
+        
+        # STEP 3
+        step = 3
+        digin_init_step3 = {
+            'qtpyvcp.FbkIn_Gama_I_Mot.on': {
+                'leyenda_error': "S.I. GAMA I MOTORIZADA (D-S16)",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_Gama_II_Mot.on': {
+                'leyenda_error': "S.I. GAMA II MOTORIZADA (D-S17)",
+                'estado': 0
+            },
+        }
+
+        errores = self.check_init(digin_init_step3)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 3")
+            for err in errores:
+                print("los checkinit por los cuales no ejecuta rutina son",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+                self.actual_gear = 'gear12'
+        
+
+        # STEP 4
+        step = 4
+        digin_init_step4 = {
+            'qtpyvcp.FbkIn_Gama_I_Mot.on': {
+                'leyenda_error': "S.I. GAMA I MOTORIZADA (D-S16)",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Gama_II_Mot.on': {
+                'leyenda_error': "S.I. GAMA II MOTORIZADA (D-S17)",
+                'estado': 1
+            },
+        }
+
+        errores = self.check_init(digin_init_step4)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 4")
+            for err in errores:
+                print("los checkinit por los cuales no ejecuta rutina son",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+                self.actual_gear = 'gear22'
+
+        
+
+        # STEP 4
+        step = 4
+        digin_init_step4 = {
+            'qtpyvcp.FbkIn_Gama_I_Mot.on': {
+                'leyenda_error': "S.I. GAMA I MOTORIZADA (D-S16)",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Gama_II_Mot.on': {
+                'leyenda_error': "S.I. GAMA II MOTORIZADA (D-S17)",
+                'estado': 1
+            },
+        }
+
+        errores = self.check_init(digin_init_step4)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 4")
+            for err in errores:
+                print("los checkinit por los cuales no ejecuta rutina son",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+                self.actual_gear = 'gear22'
+
+
+
+
+                
+        return False
 
     def gama_changer_1(self):
         rutina_nombre = 'gama_changer_1'
@@ -544,7 +726,7 @@ class ProbeBasicLathe(VCPMainWindow):
         self.init_conditions_error_messages[rutina_nombre] = errores[:]
 
         if errores:
-            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 1")
+            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 2")
             for err in errores:
                 print("los checkinit por ls cuales no ejecuta rutina son 2",err)
         else:
@@ -576,8 +758,6 @@ class ProbeBasicLathe(VCPMainWindow):
                 },
                 return (dict_cmds, step)
 
-
-
         return False
 
 
@@ -599,22 +779,6 @@ class ProbeBasicLathe(VCPMainWindow):
                 error_messages.append((leyenda_error))
         print(error_messages)
         return error_messages
-    
-
-    def activar_salidas_con_check(self, dict_cmds, rutina_nombre):
-        for key, value in dict_cmds.items():
-            estado = value['estado']
-            leyenda_error = value['leyenda_error']
-
-            if not self.send_pneumatic(key, estado):
-                print(leyenda_error)
-                self.routine_error_messages[rutina_nombre].append(leyenda_error)
-                self.err_routine = False
-                return False  # si falla alguna, aborta
-            time.sleep(0.3)  # delay entre comandos si necesitás
-
-        return True  # todas fueron exitosas
-
     
 
     #send neumatic commands
