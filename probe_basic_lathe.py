@@ -457,6 +457,7 @@ class ProbeBasicLathe(VCPMainWindow):
         if errores:
             print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 0")
             for err in errores:
+                pass
                 print("los checkinit por los cuales no ejecuta rutina son",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
@@ -486,6 +487,7 @@ class ProbeBasicLathe(VCPMainWindow):
         if errores:
             print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 1")
             for err in errores:
+                pass
                 print("los checkinit por los cuales no ejecuta rutina son",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
@@ -516,6 +518,7 @@ class ProbeBasicLathe(VCPMainWindow):
         if errores:
             print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 2")
             for err in errores:
+                pass
                 print("los checkinit por los cuales no ejecuta rutina son",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
@@ -542,6 +545,7 @@ class ProbeBasicLathe(VCPMainWindow):
         if errores:
             print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 3")
             for err in errores:
+                pass
                 print("los checkinit por los cuales no ejecuta rutina son",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
@@ -568,6 +572,7 @@ class ProbeBasicLathe(VCPMainWindow):
         if errores:
             print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 4")
             for err in errores:
+                pass
                 print("los checkinit por los cuales no ejecuta rutina son",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
@@ -595,6 +600,7 @@ class ProbeBasicLathe(VCPMainWindow):
         if errores:
             print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 4")
             for err in errores:
+                pass
                 print("los checkinit por los cuales no ejecuta rutina son",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
@@ -612,7 +618,7 @@ class ProbeBasicLathe(VCPMainWindow):
         # STEP 0
         step = 0
         digin_init_step0 = {
-            self.py_mcodes_pins["PYM41"]: {
+            self.py_mcodes_pins["PYM18"]: {
                 'leyenda_error': "m41 no está prendido",
                 'estado': 1
             },
@@ -630,9 +636,10 @@ class ProbeBasicLathe(VCPMainWindow):
         self.init_conditions_error_messages[rutina_nombre] = errores[:]
 
         if errores:
-            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 0")
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 0")
             for err in errores:
-                print("los checkinit por ls cuales no ejecuta rutina son",err)
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
                 print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
@@ -647,7 +654,7 @@ class ProbeBasicLathe(VCPMainWindow):
         # STEP 1 (cuando ya se ejecutó step 0)
         step = 1
         digin_init_step1 = {
-            self.py_mcodes_pins["PYM41"]: {
+            self.py_mcodes_pins["PYM18"]: {
                 'leyenda_error': "m41 no está prendido",
                 'estado': 1
             },
@@ -669,9 +676,10 @@ class ProbeBasicLathe(VCPMainWindow):
         self.init_conditions_error_messages[rutina_nombre] = errores[:]
 
         if errores:
-            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 1")
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 1")
             for err in errores:
-                print("los checkinit por ls cuales no ejecuta rutina son 2",err)
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 2",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
                 print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
@@ -704,7 +712,7 @@ class ProbeBasicLathe(VCPMainWindow):
         # STEP 2 (cuando ya se ejecutó step 1)
         step = 1
         digin_init_step1 = {
-            self.py_mcodes_pins["PYM41"]: {
+            self.py_mcodes_pins["PYM18"]: {
                 'leyenda_error': "m41 no está prendido",
                 'estado': 1
             },
@@ -726,9 +734,10 @@ class ProbeBasicLathe(VCPMainWindow):
         self.init_conditions_error_messages[rutina_nombre] = errores[:]
 
         if errores:
-            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 2")
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 2")
             for err in errores:
-                print("los checkinit por ls cuales no ejecuta rutina son 2",err)
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 2",err)
         else:
             if step not in self.active_threads[rutina_nombre]:
                 print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
@@ -777,7 +786,7 @@ class ProbeBasicLathe(VCPMainWindow):
             if hal_value != estado_esperado:
                 # podés retornar una tupla (nombre, mensaje)
                 error_messages.append((leyenda_error))
-        print(error_messages)
+        #print(error_messages)
         return error_messages
     
 
