@@ -525,92 +525,6 @@ class ProbeBasicLathe(VCPMainWindow):
                 print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
                 self.actual_gear = 'gear3'
 
-        
-        # STEP 3
-        step = 3
-        digin_init_step3 = {
-            'qtpyvcp.FbkIn_Gama_I_Mot.on': {
-                'leyenda_error': "S.I. GAMA I MOTORIZADA (D-S16)",
-                'estado': 1
-            },
-            'qtpyvcp.FbkIn_Gama_II_Mot.on': {
-                'leyenda_error': "S.I. GAMA II MOTORIZADA (D-S17)",
-                'estado': 0
-            },
-        }
-
-        errores = self.check_init(digin_init_step3)
-        self.init_conditions_error_messages[rutina_nombre] = errores[:]
-
-        if errores:
-            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 3")
-            for err in errores:
-                pass
-                print("los checkinit por los cuales no ejecuta rutina son",err)
-        else:
-            if step not in self.active_threads[rutina_nombre]:
-                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
-                self.actual_gear = 'gear12'
-        
-
-        # STEP 4
-        step = 4
-        digin_init_step4 = {
-            'qtpyvcp.FbkIn_Gama_I_Mot.on': {
-                'leyenda_error': "S.I. GAMA I MOTORIZADA (D-S16)",
-                'estado': 0
-            },
-            'qtpyvcp.FbkIn_Gama_II_Mot.on': {
-                'leyenda_error': "S.I. GAMA II MOTORIZADA (D-S17)",
-                'estado': 1
-            },
-        }
-
-        errores = self.check_init(digin_init_step4)
-        self.init_conditions_error_messages[rutina_nombre] = errores[:]
-
-        if errores:
-            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 4")
-            for err in errores:
-                pass
-                print("los checkinit por los cuales no ejecuta rutina son",err)
-        else:
-            if step not in self.active_threads[rutina_nombre]:
-                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
-                self.actual_gear = 'gear22'
-
-        
-
-        # STEP 4
-        step = 4
-        digin_init_step4 = {
-            'qtpyvcp.FbkIn_Gama_I_Mot.on': {
-                'leyenda_error': "S.I. GAMA I MOTORIZADA (D-S16)",
-                'estado': 0
-            },
-            'qtpyvcp.FbkIn_Gama_II_Mot.on': {
-                'leyenda_error': "S.I. GAMA II MOTORIZADA (D-S17)",
-                'estado': 1
-            },
-        }
-
-        errores = self.check_init(digin_init_step4)
-        self.init_conditions_error_messages[rutina_nombre] = errores[:]
-
-        if errores:
-            print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 4")
-            for err in errores:
-                pass
-                print("los checkinit por los cuales no ejecuta rutina son",err)
-        else:
-            if step not in self.active_threads[rutina_nombre]:
-                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
-                self.actual_gear = 'gear22'
-
-
-
-
-                
         return False
 
     def gama_changer_1(self):
@@ -687,31 +601,25 @@ class ProbeBasicLathe(VCPMainWindow):
                     'Cmd_EV_Gama_M41': {
                         'leyenda_error': "Step 1 - ACTIVA GAMA M43",
                         'estado': True
-                    }
-                },
-                dict_cmds = {
+                    },
                     'Cmd_EV_Gamas_M42M43': {
                         'leyenda_error': "Step 1 - ACTIVA GAMA M43",
                         'estado': False
-                    }
-                },
-                dict_cmds = {
+                    },
                     'Cmd_EV_Gama_M43': {
                         'leyenda_error': "Step 1 - ACTIVA GAMA M43",
                         'estado': True
-                    }
-                },
-                dict_cmds = {
+                    },
                     'Cmd_EV_Gamas_M41M43': {
                         'leyenda_error': "Step 1 - ACTIVA GAMA M43",
                         'estado': False
-                    }
+                    },
                 },
                 return (dict_cmds, step)
         
         # STEP 2 (cuando ya se ejecutó step 1)
-        step = 1
-        digin_init_step1 = {
+        step = 2
+        digin_init_step2 = {
             self.py_mcodes_pins["PYM18"]: {
                 'leyenda_error': "m41 no está prendido",
                 'estado': 1
@@ -730,7 +638,7 @@ class ProbeBasicLathe(VCPMainWindow):
             }
         }
 
-        errores = self.check_init(digin_init_step1)
+        errores = self.check_init(digin_init_step2)
         self.init_conditions_error_messages[rutina_nombre] = errores[:]
 
         if errores:
@@ -741,30 +649,304 @@ class ProbeBasicLathe(VCPMainWindow):
         else:
             if step not in self.active_threads[rutina_nombre]:
                 print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                self.actual_gear = 'gear1'
+
+                dict_cmds = {
+                    self.py_mcodes_pins["PYM18"]: {
+                        'leyenda_error': "Step 2 - BAJA M41",
+                        'estado': 0
+                    },
+                    'Cmd_Vel_CambioGamas': {
+                        'leyenda_error': "Step 2 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': False
+                    },
+                },
+
+                return (dict_cmds, step)
+        
+        # STEP 3 (cuando ya se ejecutó step 1)
+        step = 3
+        digin_init_step3 = {
+            self.py_mcodes_pins["PYM20"]: {
+                'leyenda_error': "m41 no está prendido",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_MotCab_Det.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_II.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+        }
+
+        errores = self.check_init(digin_init_step3)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 3")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 3",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                dict_cmds = {
+                    'Cmd_Vel_CambioGamas': {
+                        'leyenda_error': "Step 3 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': True
+                    }
+                },
+
+                return (dict_cmds, step)
+            
+        # STEP 4 (cuando ya se ejecutó step 1)
+        step = 4
+        digin_init_step4 = {
+            self.py_mcodes_pins["PYM19"]: {
+                'leyenda_error': "m41 no está prendido",
+                'estado': 1
+            },
+            'qtpyvcp.FbkOut_Vel_CambioGamas.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_VelCambioGama.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_FrenoCab_Lib.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+        }
+
+        errores = self.check_init(digin_init_step4)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 4")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 4",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
                 dict_cmds = {
                     'Cmd_EV_Gama_M41': {
-                        'leyenda_error': "Step 1 - ACTIVA GAMA M43",
-                        'estado': True
-                    }
-                },
-                dict_cmds = {
+                        'leyenda_error': "Step 4 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': False
+                    },
                     'Cmd_EV_Gamas_M42M43': {
-                        'leyenda_error': "Step 1 - ACTIVA GAMA M43",
-                        'estado': False
-                    }
-                },
-                dict_cmds = {
-                    'Cmd_EV_Gama_M43': {
-                        'leyenda_error': "Step 1 - ACTIVA GAMA M43",
+                        'leyenda_error': "Step 4 - VELOCIDAD DE CAMBIO DE GAMAS",
                         'estado': True
-                    }
-                },
-                dict_cmds = {
+                    },
+                    'Cmd_EV_Gama_M43': {
+                        'leyenda_error': "Step 4 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': True
+                    },
                     'Cmd_EV_Gamas_M41M43': {
-                        'leyenda_error': "Step 1 - ACTIVA GAMA M43",
+                        'leyenda_error': "Step 4 - VELOCIDAD DE CAMBIO DE GAMAS",
                         'estado': False
-                    }
+                    },
                 },
+
+                return (dict_cmds, step)
+            
+        # STEP 5 (cuando ya se ejecutó step 1)
+        step = 5
+        digin_init_step5 = {
+            self.py_mcodes_pins["PYM19"]: {
+                'leyenda_error': "m41 no está prendido",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_FbkIn_Ind_Gama_I.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_II.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_III.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+        }
+
+        errores = self.check_init(digin_init_step5)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 5")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 5",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                self.actual_gear = 'gear2'
+
+                dict_cmds = {
+                    self.py_mcodes_pins["PYM19"]: {
+                        'leyenda_error': "Step 5 - BAJA M41",
+                        'estado': 0
+                    },
+                    'Cmd_Vel_CambioGamas': {
+                        'leyenda_error': "Step 5 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': False
+                    },
+                },
+
+                return (dict_cmds, step)
+            
+        # STEP 6 (cuando ya se ejecutó step 1)
+        step = 6
+        digin_init_step6 = {
+            self.py_mcodes_pins["PYM20"]: {
+                'leyenda_error': "m41 no está prendido",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_I.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_III.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+        }
+
+        errores = self.check_init(digin_init_step6)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 5")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 5",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                self.actual_gear = 'gear2'
+
+                dict_cmds = {
+                    'Cmd_Vel_CambioGamas': {
+                        'leyenda_error': "Step 6 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': False
+                    },
+                },
+
+                return (dict_cmds, step)
+            
+        # STEP 7 (cuando ya se ejecutó step 1)
+        step = 7
+        digin_init_step7 = {
+            self.py_mcodes_pins["PYM20"]: {
+                'leyenda_error': "m41 no está prendido",
+                'estado': 1
+            },
+            'qtpyvcp.FbkOut_Vel_CambioGamas.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_VelCambioGama.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_FrenoCab_Lib.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+        }
+
+        errores = self.check_init(digin_init_step7)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 5")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 5",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                self.actual_gear = 'gear2'
+
+                dict_cmds = {
+                    'Cmd_EV_Gama_M41': {
+                        'leyenda_error': "Step 7 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': False
+                    },
+                    'Cmd_EV_Gamas_M42M43': {
+                        'leyenda_error': "Step 7 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': False
+                    },
+                    'Cmd_EV_Gama_M43': {
+                        'leyenda_error': "Step 7 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': False
+                    },
+                    'Cmd_EV_Gamas_M41M43': {
+                        'leyenda_error': "Step 7 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': True
+                    },
+                },
+
+                return (dict_cmds, step)
+            
+        # STEP 8 (cuando ya se ejecutó step 1)
+        step = 8
+        digin_init_step8 = {
+            self.py_mcodes_pins["PYM20"]: {
+                'leyenda_error': "m41 no está prendido",
+                'estado': 1
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_I.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_II.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 0
+            },
+            'qtpyvcp.FbkIn_Ind_Gama_III.on': {
+                'leyenda_error': "MOTOR CABEZAL DETENIDO",
+                'estado': 1
+            },
+        }
+
+        errores = self.check_init(digin_init_step8)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 8")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 8",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                self.actual_gear = 'gear3'
+
+                dict_cmds = {
+                    self.py_mcodes_pins["PYM20"]: {
+                        'leyenda_error': "Step 8 - BAJA M41",
+                        'estado': 0
+                    },
+                    'Cmd_Vel_CambioGamas': {
+                        'leyenda_error': "Step 8 - VELOCIDAD DE CAMBIO DE GAMAS",
+                        'estado': False
+                    },
+                },
+
                 return (dict_cmds, step)
 
         return False
