@@ -544,6 +544,12 @@ class ProbeBasicLathe(VCPMainWindow):
                 'estado': 0
             }
         }
+        hal.get_value(self.py_mcodes_pins["PYM18"] == False,"m41 no está prendido") and
+        hal.get_value('qtpyvcp.FbkIn_MotCab_Det.on' == True,"MOTOR CABEZAL DETENIDO") and
+        hal.get_value('qtpyvcp.FbkIn_Ind_Gama_I.on' == True,"SENSOR INDUCTIVO GAMA I")
+
+        self.main_window.send_pneumatic('Cmd_Vel_CambioGamas', True)
+
 
         errores = self.check_init(digin_init_step0)
         self.init_conditions_error_messages[rutina_nombre] = errores[:]
@@ -1108,7 +1114,6 @@ class ProbeBasicLathe(VCPMainWindow):
                 return (dict_cmds, step)
             
         return False
-
 
     def cana_tailstock(self):
         rutina_nombre = 'cana_tailstock'
