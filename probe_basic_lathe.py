@@ -415,20 +415,41 @@ class ProbeBasicLathe(VCPMainWindow):
 
 
     def check_init(self, dict_init):
-        s = linuxcnc.stat()
-        s.poll()
-        error_messages = []
+        # """
+        # Recorre dict_init, donde cada clave es:
+        #   - una string → comprueba AND: debe coincidir hal.get_value(clave) == estado
+        #   - una tupla/list → comprueba OR: al menos una de las señales debe == estado
 
-        for key, value in dict_init.items():
-            hal_name = key
-            hal_value = hal.get_value(hal_name)
-            estado_esperado = value['estado']
-            leyenda_error = value['leyenda_error']
+        # dict_init = {
+        #   'señal_unica': {
+        #       'estado': 1,
+        #       'leyenda_error': '…'
+        #   },
+        #   ('señal_1', 'señal_2', ...): {
+        #       'estado': 1,
+        #       'leyenda_error': '…'
+        #   },
+        #   …
+        # }
+        # """
+        errores = []
+        for key, cfg in dict_init.items():
+            esperado = cfg['estado']
+            leyenda  = cfg['leyenda_error']
 
-            if hal_value != estado_esperado:
-                error_messages.append(leyenda_error)
+            if isinstance(key, (tuple, list)):
+                # OR: al menos una señal debe estar en el estado esperado
+                valores = [hal.get_value(sig) for sig in key]
+                if not any(v == esperado for v in valores):
+                    errores.append(leyenda)
+            else:
+                # AND: la señal única debe estar en el estado esperado
+                valor = hal.get_value(key)
+                if valor != esperado:
+                    errores.append(leyenda)
 
-        return error_messages
+        return errores
+
 
 
     def init_cycle(self):
@@ -1109,7 +1130,6 @@ class ProbeBasicLathe(VCPMainWindow):
             
         return False
 
-
     def cana_tailstock(self):
         rutina_nombre = 'cana_tailstock'
         s = linuxcnc.stat()
@@ -1147,7 +1167,7 @@ class ProbeBasicLathe(VCPMainWindow):
                 dict_cmds = {
                     self.py_mcodes_pins["PYM27"]: {
                         'leyenda_error': "Step 0 - SUBE m66",
-                        'estado': 1
+                        'estado': True
                     },
                 }
                 return (dict_cmds, step)
@@ -1198,6 +1218,10 @@ class ProbeBasicLathe(VCPMainWindow):
                 'leyenda_error': "m700 no está prendido",
                 'estado': 0
             },
+            ('qtpyvcp.FbkIn_Pedal_RetContra.on', self.py_mcodes_pins["PYM28"]): {
+                'estado': 1,
+                'leyenda_error': 'Ni I65 ni M66 están activos'
+            },
         }
 
         errores = self.check_init(digin_init_step2)
@@ -1219,15 +1243,236 @@ class ProbeBasicLathe(VCPMainWindow):
                     },
                     self.py_mcodes_pins["PYM27"]: {
                         'leyenda_error': "m66 no está prendido",
-                        'estado': 0
+                        'estado': False
                     },
                     
                 },
 
                 return (dict_cmds, step)
             
+
+        # STEP 3 (cuando ya se ejecutó step 1)
+        step = 3
+        if s.task_mode != linuxcnc.MODE_MANUAL:
+            digin_init_step3 = {
+                ('qtpyvcp.FbkOut_EV_CanaContra_Adel.on'): {
+                    'estado': 1,
+                    'leyenda_error': 'E.V. CANA CONTRAPUNTA ADELANTE (H-K4/21) (H-K3/A1)'
+                },
+                ('qtpyvcp.FbkIn_Pres_Cana.on'): {
+                    'estado': 1,
+                    'leyenda_error': 'PRESION CANA (H-F11)'
+                },
+            }
+
+            errores = self.check_init(digin_init_step3)
+            self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+            if errores:
+                #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 8")
+                for err in errores:
+                    pass
+                    #print("los checkinit por ls cuales no ejecuta rutina son 8",err)
+            else:
+                if step not in self.active_threads[rutina_nombre]:
+                    print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                    print("ACA TENGO QUE PONER EL ERROR 16 FALLO PRESION CONTRAPUNTA")
+
+                    return (dict_cmds, step)
+                
+        
+        # STEP 4 (cuando ya se ejecutó step 1)
+        step = 4
+        if s.task_mode != linuxcnc.MODE_MANUAL and s.interp_state != linuxcnc.INTERP_IDLE:
+            digin_init_step4 = {
+                ('qtpyvcp.FbkOut_EV_CanaContra_Adel.on'): {
+                    'estado': 1,
+                    'leyenda_error': 'E.V. CANA CONTRAPUNTA ADELANTE (H-K4/21) (H-K3/A1)'
+                },
+            }
+
+            errores = self.check_init(digin_init_step4)
+            self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+            if errores:
+                #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 8")
+                for err in errores:
+                    pass
+                    #print("los checkinit por ls cuales no ejecuta rutina son 8",err)
+            else:
+                if step not in self.active_threads[rutina_nombre]:
+                    print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                    print("ACA TENGO QUE PONER EL ERROR 17 BASE CONTRAPUNTA DESBLOQUEADA")
+
+                    dict_cmds = {
+                        self.py_mcodes_pins["PYM27"]: {
+                            'leyenda_error': "m66 no está prendido",
+                            'estado': False
+                        },  
+                    },
+
+                    return (dict_cmds, step)
+
+            
+        # STEP 5 (cuando ya se ejecutó step 1)
+        step = 5
+        digin_init_step5 = {
+            ('qtpyvcp.FbkOut_EV_CanaContra_Adel.on'): {
+                'estado': 1,
+                'leyenda_error': 'E.V. CANA CONTRAPUNTA ADELANTE (H-K4/21) (H-K3/A1)'
+            },
+            ('qtpyvcp.FbkIn_Cana_Adelante.on'): {
+                'estado': 1,
+                'leyenda_error': 'E.V. CANA CONTRAPUNTA ADELANTE (H-K4/21) (H-K3/A1)'
+            },
+        }
+
+        errores = self.check_init(digin_init_step5)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 8")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 8",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                print("ACA TENGO QUE PONER EL ERROR 18 FIN DE RECORRIDO CANA")
+
+                dict_cmds = {
+                    self.py_mcodes_pins["PYM27"]: {
+                        'leyenda_error': "m66 no está prendido",
+                        'estado': False
+                    },  
+                },
+
+                return (dict_cmds, step)
+        
+        # STEP 6 (cuando ya se ejecutó step 1)
+        step = 6
+        digin_init_step6 = {
+            self.py_mcodes_pins["PYM28"]: {
+                'leyenda_error': "m67 no está prendido",
+                'estado': 1
+            },
+            ('qtpyvcp.FbkOut_EV_CanaContra_Atras.on'): {
+                'estado': 1,
+                'leyenda_error': 'E.V. CANA CONTRAPUNTA ATRAS (H-K3/21) (H-K4/A1)'
+            },
+            ('qtpyvcp.FbkIn_Cana_Atras.on'): {
+                'estado': 1,
+                'leyenda_error': 'S.I. CANA ATRAS (H-S14)'
+            },
+        }
+
+        errores = self.check_init(digin_init_step6)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 8")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 8",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                print("ACA TENGO QUE PONER EL ERROR 18 FIN DE RECORRIDO CANA")
+
+                dict_cmds = {
+                    self.py_mcodes_pins["PYM27"]: {
+                        'leyenda_error': "m66 no está prendido",
+                        'estado': False
+                    },  
+                },
+
+                return (dict_cmds, step)
+
         return False
 
+    def chip_conveyor(self):
+        rutina_nombre = 'chip_conveyor'
+        s = linuxcnc.stat()
+        s.poll()  # Actualizar los valores de estado
+        # STEP 0
+        step = 0
+        # print("La máquina está en modo automático.")
+        digin_init_step0 = {
+            self.py_mcodes_pins["PYM31"]: {
+                'leyenda_error': "m101 no está prendido",
+                'estado': 1
+            },
+            self.py_mcodes_pins["PYM38"]: {
+                'leyenda_error': "m328 no está apagado",
+                'estado': 0
+            },
+        }
+
+        errores = self.check_init(digin_init_step0)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 0")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+                dict_cmds = {
+                    self.py_mcodes_pins["PYM38"]: {
+                        'leyenda_error': "Step 0 - SUBE M328",
+                        'estado': 1
+                    },
+                }
+                return (dict_cmds, step)
+
+        return False         
+
+    def coolant(self):
+        rutina_nombre = 'coolant'
+        s = linuxcnc.stat()
+        s.poll()
+        # STEP 2 (cuando ya se ejecutó step 1)
+        step = 2
+        digin_init_step2 = {
+
+            (self.py_mcodes_pins["PYM6"], self.py_mcodes_pins["PYM9"]): {
+                'estado': 1,
+                'leyenda_error': 'Ni I65 ni M66 están activos'
+            },
+        }
+
+        errores = self.check_init(digin_init_step2)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 8")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 8",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                dict_cmds = {
+                    'Cmd_EV_CanaContra_Atras': {
+                        'leyenda_error': "Step 2 - E.V. CANA CONTRAPUNTA ATRAS (H-K3/21) (H-K4/A1)",
+                        'estado': True
+                    },
+                    self.py_mcodes_pins["PYM27"]: {
+                        'leyenda_error': "m66 no está prendido",
+                        'estado': False
+                    },
+                    
+                },
+
+                return (dict_cmds, step)
+        
 
 
     def check_init(self, dict_init):
