@@ -1437,14 +1437,48 @@ class ProbeBasicLathe(VCPMainWindow):
         rutina_nombre = 'coolant'
         s = linuxcnc.stat()
         s.poll()
+        # STEP 1 (cuando ya se ejecutó step 1)
+        step = 1
+        digin_init_step1 = {
+            (self.py_mcodes_pins["PYM6"], self.py_mcodes_pins["PYM9"]): {
+                'estado': 1,
+                'leyenda_error': 'Ni m8 ni m12 están activos'
+            },
+        }
+
+        errores = self.check_init(digin_init_step1)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 8")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 8",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                dict_cmds = {
+                    'Cmd_Bomba_Refrig': {
+                        'leyenda_error': "Step 1 - BOMBA REFRIGERANTE (E-K1/43)",
+                        'estado': True
+                    },
+                },
+
+                return (dict_cmds, step)
+        
         # STEP 2 (cuando ya se ejecutó step 1)
         step = 2
         digin_init_step2 = {
-
-            (self.py_mcodes_pins["PYM6"], self.py_mcodes_pins["PYM9"]): {
+            self.py_mcodes_pins["PYM6"]: {
                 'estado': 1,
-                'leyenda_error': 'Ni I65 ni M66 están activos'
+                'leyenda_error': 'm8 no está activo'
             },
+            ('qtpyvcp.FbkIn_StopGiroCab.on'): {
+                'estado': 0,
+                'leyenda_error': 'CONMUTADOR DETENER GIRO CABEZAL ('
+            },
+
         }
 
         errores = self.check_init(digin_init_step2)
@@ -1460,15 +1494,45 @@ class ProbeBasicLathe(VCPMainWindow):
                 print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
 
                 dict_cmds = {
-                    'Cmd_EV_CanaContra_Atras': {
-                        'leyenda_error': "Step 2 - E.V. CANA CONTRAPUNTA ATRAS (H-K3/21) (H-K4/A1)",
+                    'EV_Refrig2_M12': {
+                        'leyenda_error': "Step 1 - E.V. REFRIGERANTE 2-M12 (E-K2/A1)",
                         'estado': True
                     },
-                    self.py_mcodes_pins["PYM27"]: {
-                        'leyenda_error': "m66 no está prendido",
-                        'estado': False
+                },
+
+                return (dict_cmds, step)
+
+        # STEP 3 (cuando ya se ejecutó step 1)
+        step = 3
+        digin_init_step3 = {
+            self.py_mcodes_pins["PYM9"]: {
+                'estado': 1,
+                'leyenda_error': 'm12 no está activo'
+            },
+            ('qtpyvcp.FbkIn_StopGiroCab.on'): {
+                'estado': 0,
+                'leyenda_error': 'CONMUTADOR DETENER GIRO CABEZAL ('
+            },
+
+        }
+
+        errores = self.check_init(digin_init_step3)
+        self.init_conditions_error_messages[rutina_nombre] = errores[:]
+
+        if errores:
+            #print(f"\n❌ Error en condiciones iniciales {rutina_nombre} - Step 8")
+            for err in errores:
+                pass
+                #print("los checkinit por ls cuales no ejecuta rutina son 8",err)
+        else:
+            if step not in self.active_threads[rutina_nombre]:
+                print(f"✅ Condiciones OK - {rutina_nombre} Step {step}")
+
+                dict_cmds = {
+                    'EV_Refrig1_M8': {
+                        'leyenda_error': "Step 1 - E.V. REFRIGERANTE 1-M8 (E-K1/A1)",
+                        'estado': True
                     },
-                    
                 },
 
                 return (dict_cmds, step)
