@@ -3,7 +3,7 @@
 import os
 import sys
 import importlib.util
-import time, datetime
+import time, datetime, sleep
 
 import linuxcnc
 import hal, hal_glib
@@ -58,12 +58,16 @@ class ProbeBasicLathe(VCPMainWindow):
             'gama_changer_1': [],
             'base_tailstock': [],
             'cana_tailstock': [],
+            'coolant': [],
+            'lubrication': [],
         }
         self.active_threads = {
             'gama_changer_1': [],
             'init_cycle': [],
             'base_tailstock': [],
             'cana_tailstock': [],
+            'coolant': [],
+            'lubrication': [],
         }
 
         self.actual_gear = ""
@@ -1536,6 +1540,23 @@ class ProbeBasicLathe(VCPMainWindow):
                 },
 
                 return (dict_cmds, step)
+            
+        return False
+
+    def lubrication(self):
+        rutina_nombre = 'lubrication'
+        s = linuxcnc.stat()
+        s.poll()
+        # aca simplemente tengo que hacer la ejecucion de la ev de la lubricacion cada 20 minutos
+        # este tiempo no lo puedo poner aca por que se me va a quedar atrapado el main aca
+        # tengo que ponerlo dentro de rutina para que no me trave todo lo demas
+        time.sleep(1200)
+        
+            
+        return False
+        
+    def chuck(self):
+        rutina_nombre = 'chuck'
         
 
 
